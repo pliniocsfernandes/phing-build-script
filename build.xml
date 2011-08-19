@@ -7,7 +7,6 @@
 
 	<!-- Delete the Publish directory to start from scratch -->
 	<target name="build.delete">
-		<echo message="${build.dir}" />
 		<delete dir="${build.dir}" />
 	</target>
 
@@ -39,7 +38,9 @@
 
 	<!-- Concatenate JS -->
 	<target name="js.concat">
+
 		<echo msg="Concatenating JavaScript files." />
+		<echo msg="${js.linkPaths}" />
 		<mkdir dir="${build.jsPath}" />
 		<append destfile="${build.jsPath}/${js.concat.min}">
 			<filelist dir="${base.dir}" files="${js.linkPaths}" />
@@ -133,13 +134,12 @@
 				function findLinks($file) {
 					$file = file_get_contents("${base.dir}/$file");
 					$this->log("Stripping out the '$this->type' path.");
-					$links = trim(preg_replace('/[\s\S]+?<!--\s*' . $this->type . '\s*-->([\s\S]+)<!--\s*end ' . $this->type . '\s*-->[\s\S]+/', "$1", $file));
 
+					$links = trim(preg_replace('/[\s\S]+?<!--\s*' . $this->type . '\s*-->([\s\S]+)<!--\s*end ' . $this->type . '\s*-->[\s\S]+/', "$1", $file, -1, $count));
+
+					
 					// If the returned val from the preg_replace is the same, there's no match. // Remove this one from the list. It does not have script or link tags.
-
-					if ( $links === $file ) {
-						return false;
-					}
+					if ( $count === 0 ) return false;
 
 					if ( $this->type === 'css' ) {
 						$links = preg_replace("/<link.+?href=[\"']?([^'\"]+)['\"]?[^>]+>/i", "$1", $links);
@@ -169,6 +169,15 @@
 			<filelist dir="${build.dir}" files="${css.linkPaths}" />
 		</delete>
 	</target>
+
+	<!-- Run CSS through Prefixr.com -->
+   <target name="prefixr">
+      <echo msg="Updating your stylesheet" />
+      <loadfile property="css.min" file="${build.cssPath}/${css.concat.min}" />
+      <exec command="curl -sSd css='${css.min}' http://prefixr.com/api/index.php > ${build.cssPath}/${css.concat.min}" />
+
+      <phingcall target="minify.loop" />
+   </target>
 
 
 	<target name="main" depends="build.delete, build.createDir, assets.getPaths, copy.all, js.concat, css.concat, minify.loop, assets.update, html.minifyLoop, delete.unnecessaryFiles">
