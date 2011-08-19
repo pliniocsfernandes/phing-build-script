@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="demo" default="main">
+<project name="demo" default="build">
 	<property file="build.properties" />
 	<property name="build.jsPath" value="${build.dir}/${base.js.path}" />
 	<property name="build.cssPath" value="${build.dir}/${base.css.path}" />
@@ -180,7 +180,7 @@
    </target>
 
 
-	<target name="main" depends="build.delete, build.createDir, assets.getPaths, copy.all, js.concat, css.concat, minify.loop, assets.update, html.minifyLoop, delete.unnecessaryFiles">
+	<target name="build" depends="build.delete, build.createDir, assets.getPaths, copy.all, js.concat, css.concat, minify.loop, assets.update, html.minifyLoop, delete.unnecessaryFiles">
 	</target>
 
 
