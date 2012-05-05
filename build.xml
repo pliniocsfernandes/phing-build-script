@@ -20,6 +20,7 @@
 			<fileset dir="${base.dir}">
 				<exclude name="${build.publishName}" />
 				<exclude name="build/" />
+				<exclude name="docs/" />
 			</fileset>
 		</copy>
 	</target>
