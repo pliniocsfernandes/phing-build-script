@@ -72,7 +72,7 @@
 	<target name="assets.update">
 		<echo message="Replacing old script links with new ones." />
 		<reflexive>
-			<fileset dir="${build.dir}" includes="**/*.html, **/*.php" />	
+			<fileset dir="${build.dir}" includes="**/*.html, **/*.php" />
 			 <filterchain>
 			    <replaceregexp>
 			      <regexp pattern="&lt;!--\s*js\s*-->[\s\S]+?&lt;!--\s*end js\s*-->" replace="&lt;script src='./${base.js.path}/${js.concat.min}/${js.concat.min}'>&lt;/script>" />
@@ -81,7 +81,7 @@
 			    </replaceregexp>
 			  </filterchain>
 		</reflexive>
-		
+
 	</target>
 
 	<target name="assets.createLinks">
@@ -120,7 +120,8 @@
 				function getFiles() {
 					// Get list of all HTML and PHP files in the base directory.
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('${base.dir}'));
-					$objects = new RegexIterator($objects, '/\.(?:html|php)$/i', RecursiveRegexIterator::GET_MATCH);
+
+					$objects = new RegexIterator($objects, '/(?<!class)\.(?:html|php)$/i', RecursiveRegexIterator::GET_MATCH);
 
 					$files = array();
 					foreach($objects as $name => $object) {
