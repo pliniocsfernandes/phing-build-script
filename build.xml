@@ -64,7 +64,8 @@
 
 	<!-- Minify HTML Files -->
 	<target name="html.minify">
-		<exec command="java -jar htmlcompressor-1.5.3.jar ${absfilename} -o ${absfilename}" />
+		<echo msg="HTML Minify on ${absfilename}" />
+		<exec command="java -jar htmlcompressor-1.5.3.jar --preserve-php ${absfilename} -o ${absfilename}" />
 	</target>
 
 	<!-- Update HTML Files with new Links -->
