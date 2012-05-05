@@ -131,29 +131,35 @@
 					$this->files = $files;
 				}
 
-				function findLinks($file) {
-					$file = file_get_contents("${base.dir}/$file");
-					$this->log("Stripping out the '$this->type' path.");
+				function findLinks($fileName) {
+					$file = file_get_contents("${base.dir}/$fileName");
+					$this->log("Stripping out the '$this->type' path from '$fileName'.");
 
-					$links = trim(preg_replace('/[\s\S]+?<!--\s*' . $this->type . '\s*-->([\s\S]+)<!--\s*end ' . $this->type . '\s*-->[\s\S]+/', "$1", $file, -1, $count));
+					$count = preg_match_all("/<!-- " . $this->type . " -->(.+?)<!-- end " . $this->type . " -->/mis", $file, $links);
 
-					
-					// If the returned val from the preg_replace is the same, there's no match. // Remove this one from the list. It does not have script or link tags.
-					if ( $count === 0 ) return false;
-
-					if ( $this->type === 'css' ) {
-						$links = preg_replace("/<link.+?href=[\"']?([^'\"]+)['\"]?[^>]+>/i", "$1", $links);
-					} else if ( $this->type === 'js' ) {
-						$links = preg_replace("/<script.+?src=[\"']?([^\"']+)[\"']?[\s\S]+?<\/script>/", "$1", $links);
+					// If the returned val from the preg_replace is the same, there's no match.
+					// Remove this one from the list. It does not have script or link tags.
+					if ( $count === 0 ) {
+						return false;
 					}
 
-					$links = preg_replace('/\s+/', ',', $links);
+					$links = implode(" ",$links[1]);
+
+					if ( $type === 'css' ) {
+						$count = preg_match_all("/<link.+?href=[\"']?([^'\"]+)['\"]?[^>]+>/i", $links, $matches);
+					} else if ( $type === 'js' ) {
+						$count = preg_match_all("/<script.+?src=[\"']?([^\"']+)[\"']?[\s\S]+?<\/script>/i", $links, $matches);
+					}
+					if ($count === 0) {
+					    return false;
+					}
+					$links = implode(",",$matches[1]);
 					return $links;
 				}
 			}
 			]]>
 		</adhoc-task>
-	
+
 	</target>
 
 	<target name="assets.getPaths" depends="assets.createLinks">
@@ -179,9 +185,7 @@
       <phingcall target="minify.loop" />
    </target>
 
-
 	<target name="build" depends="build.delete, build.createDir, assets.getPaths, copy.all, js.concat, css.concat, minify.loop, assets.update, html.minifyLoop, delete.unnecessaryFiles">
 	</target>
-
 
 </project>
