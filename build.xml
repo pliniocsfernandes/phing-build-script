@@ -35,7 +35,6 @@
 		<exec command="java -jar yuicompressor-2.4.7.jar ${absfilename} -o ${absfilename}" />
 	</target>
 
-
 	<!-- Concatenate JS -->
 	<target name="js.concat">
 
@@ -58,9 +57,7 @@
 
 	<target name="html.minifyLoop">
 		<foreach param="filename" absparam="absfilename" target="html.minify">
-			<fileset dir="${build.dir}" includes="**/*.html, **/*.php">
-				<contains text="&lt;body>" />
-			</fileset>
+			<fileset dir="${build.dir}" includes="**/*.html, **/*.php"></fileset>
 		</foreach>
 	</target>
 
